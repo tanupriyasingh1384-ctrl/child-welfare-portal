@@ -1,0 +1,63 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Child {
+  id               String             @id @default(uuid())
+  fullName         String
+  ageYears         Int?
+  gender           String?
+  guardianName     String?
+  guardianPhone    String?
+  villageOrCity    String
+  district         String
+  state            String
+  schoolOrCenterId String?
+  createdAt        DateTime           @default(now())
+
+  incidents        IncidentReport[]
+  nutritionRecords NutritionLog[]
+  attendanceLogs   AttendanceRecord[]
+}
+
+model IncidentReport {
+  id            String   @id @default(uuid())
+  childId       String?
+  child         Child?   @relation(fields: [childId], references: [id])
+  reporterName  String
+  reporterPhone String
+  incidentType  String
+  locationDesc  String
+  district      String
+  riskLevel     String   @default("MEDIUM")
+  status        String   @default("OPEN")
+  description   String
+  reportedAt    DateTime @default(now())
+}
+
+model NutritionLog {
+  id         String   @id @default(uuid())
+  childId    String
+  child      Child    @relation(fields: [childId], references: [id])
+  ageMonths  Int
+  weightKg   Float
+  heightCm   Float
+  status     String   @default("NORMAL")
+  recordedAt DateTime @default(now())
+}
+
+model AttendanceRecord {
+  id                  String   @id @default(uuid())
+  childId             String
+  child               Child    @relation(fields: [childId], references: [id])
+  schoolId            String
+  consecutiveAbsences Int      @default(0)
+  riskFlagged         Boolean  @default(false)
+  lastAttendDate      DateTime
+  updatedAt           DateTime @updatedAt
+}

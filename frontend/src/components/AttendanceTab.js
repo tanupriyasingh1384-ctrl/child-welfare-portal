@@ -1,0 +1,53 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useState } from 'react';
+import { UserCheck, Plus, AlertTriangle, CheckCircle2, School, Calendar, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+export const AttendanceTab = ({ attendanceRecords, children, onSubmitAttendance, }) => {
+    const { t } = useLanguage();
+    const [showForm, setShowForm] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [formData, setFormData] = useState({
+        childId: '',
+        schoolId: '',
+        consecutiveAbsences: 5,
+    });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!formData.childId || !formData.schoolId) {
+            alert('Child and School ID are required.');
+            return;
+        }
+        setSubmitting(true);
+        try {
+            await onSubmitAttendance(formData);
+            setFormData({
+                childId: '',
+                schoolId: '',
+                consecutiveAbsences: 5,
+            });
+            setShowForm(false);
+        }
+        finally {
+            setSubmitting(false);
+        }
+    };
+    return (_jsxs("div", { className: "space-y-6", children: [_jsxs("div", { className: "glass-card p-6 sm:p-7 rounded-3xl border border-purple-500/20 relative overflow-hidden bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-950 shadow-2xl", children: [_jsx("div", { className: "absolute right-0 top-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" }), _jsxs("div", { className: "flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative z-10", children: [_jsxs("div", { className: "flex items-start gap-4", children: [_jsx("div", { className: "w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/30 text-white shrink-0 mt-0.5", children: _jsx(UserCheck, { className: "w-6 h-6" }) }), _jsxs("div", { children: [_jsx("h2", { className: "text-xl sm:text-2xl font-extrabold text-white tracking-tight flex items-center gap-2", children: t('attendanceTitle') }), _jsx("p", { className: "text-xs sm:text-sm text-slate-300 font-medium mt-1", children: t('attendanceSub') })] })] }), _jsxs("button", { onClick: () => setShowForm(!showForm), className: "px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-purple-600/30 transition-all duration-200 active:scale-95 shrink-0 self-start sm:self-auto", children: [showForm ? _jsx(X, { className: "w-4 h-4" }) : _jsx(Plus, { className: "w-4 h-4" }), _jsx("span", { children: showForm ? t('btnCloseAbsence') : t('btnLogAbsence') })] })] })] }), showForm && (_jsxs("div", { className: "glass-card border border-purple-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 animate-fade-in relative z-20", children: [_jsxs("div", { className: "flex items-center justify-between border-b border-slate-800 pb-4", children: [_jsxs("h3", { className: "text-lg font-bold text-purple-400 flex items-center gap-2.5", children: [_jsx(School, { className: "w-5 h-5 text-purple-500" }), t('logAbsenceTitle')] }), _jsx("span", { className: "text-xs text-slate-400 font-medium", children: t('dropoutNotice') })] }), _jsxs("form", { onSubmit: handleSubmit, className: "space-y-5", children: [_jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-5", children: [_jsxs("div", { children: [_jsx("label", { className: "text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5", children: t('selectStudentLabel') }), _jsxs("select", { required: true, value: formData.childId, onChange: (e) => {
+                                                    const selected = children.find((c) => c.id === e.target.value);
+                                                    setFormData({
+                                                        ...formData,
+                                                        childId: e.target.value,
+                                                        schoolId: selected?.schoolOrCenterId || formData.schoolId,
+                                                    });
+                                                }, className: "w-full bg-slate-900/90 border border-slate-700/80 rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none transition", children: [_jsx("option", { value: "", children: t('chooseStudentPlaceholder') }), children.map((c) => (_jsxs("option", { value: c.id, children: [c.fullName, " (", c.district, ") - ", c.schoolOrCenterId || 'No School Code'] }, c.id)))] })] }), _jsxs("div", { children: [_jsx("label", { className: "text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5", children: t('schoolCodeLabel') }), _jsx("input", { type: "text", required: true, placeholder: t('schoolCodePlaceholder'), value: formData.schoolId, onChange: (e) => setFormData({ ...formData, schoolId: e.target.value }), className: "w-full bg-slate-900/90 border border-slate-700/80 rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none transition" })] }), _jsxs("div", { children: [_jsx("label", { className: "text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5", children: t('consecutiveAbsencesLabel') }), _jsx("input", { type: "number", required: true, min: 0, max: 365, value: formData.consecutiveAbsences, onChange: (e) => setFormData({ ...formData, consecutiveAbsences: Number(e.target.value) }), className: "w-full bg-slate-900/90 border border-slate-700/80 rounded-xl p-3 text-sm text-white focus:border-purple-500 focus:outline-none transition" })] })] }), _jsxs("div", { className: "bg-slate-950/80 p-5 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4", children: [_jsx("span", { className: "text-xs text-slate-400 font-semibold", children: t('autoRiskClassification') }), formData.consecutiveAbsences >= 5 ? (_jsxs("span", { className: "flex items-center gap-1.5 bg-rose-500/20 text-rose-300 border border-rose-500/40 text-xs font-black px-3.5 py-1.5 rounded-full animate-pulse shadow-sm", children: [_jsx(AlertTriangle, { className: "w-4 h-4" }), t('criticalDropoutRisk')] })) : formData.consecutiveAbsences >= 3 ? (_jsxs("span", { className: "flex items-center gap-1.5 bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs font-black px-3.5 py-1.5 rounded-full shadow-sm", children: [_jsx(AlertTriangle, { className: "w-4 h-4" }), t('flaggedDropoutRisk')] })) : (_jsxs("span", { className: "flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-black px-3.5 py-1.5 rounded-full shadow-sm", children: [_jsx(CheckCircle2, { className: "w-4 h-4" }), t('normalAttendance')] }))] }), _jsxs("div", { className: "flex justify-end gap-3 pt-3 border-t border-slate-800", children: [_jsx("button", { type: "button", onClick: () => setShowForm(false), className: "px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold transition", children: t('cancelBtn') }), _jsxs("button", { type: "submit", disabled: submitting, className: "px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-purple-600/30 transition disabled:opacity-50", children: [_jsx(UserCheck, { className: "w-4 h-4" }), _jsx("span", { children: submitting ? t('savingAbsence') : t('btnSaveAbsence') })] })] })] })] })), _jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", children: attendanceRecords.length === 0 ? (_jsx("div", { className: "col-span-3 py-20 text-center text-slate-500 glass-card rounded-3xl border border-slate-800", children: t('noAttendanceRecords') })) : (attendanceRecords.map((att) => {
+                    const isSevereRisk = att.consecutiveAbsences >= 5;
+                    return (_jsxs("div", { className: `glass-card glass-card-hover rounded-3xl p-6 space-y-4 relative overflow-hidden ${isSevereRisk
+                            ? 'border-rose-500/60 shadow-xl shadow-rose-500/10'
+                            : att.riskFlagged
+                                ? 'border-purple-500/50 shadow-lg shadow-purple-500/10'
+                                : 'border-slate-800'}`, children: [_jsxs("div", { className: "flex justify-between items-start gap-3", children: [_jsxs("div", { children: [_jsx("h3", { className: "font-extrabold text-lg text-white", children: att.child?.fullName || 'Student Minor' }), _jsxs("p", { className: "text-xs font-semibold text-slate-400 mt-0.5", children: ["School ID: ", att.schoolId] })] }), isSevereRisk ? (_jsxs("span", { className: "flex items-center gap-1 bg-rose-500/20 text-rose-300 border border-rose-500/40 text-xs font-black px-3 py-1 rounded-full animate-pulse", children: [_jsx(AlertTriangle, { className: "w-3.5 h-3.5" }), t('critical5Days')] })) : att.riskFlagged ? (_jsxs("span", { className: "flex items-center gap-1 bg-purple-500/20 text-purple-300 border border-purple-500/40 text-xs font-black px-3 py-1 rounded-full", children: [_jsx(AlertTriangle, { className: "w-3.5 h-3.5" }), t('riskFlaggedTag')] })) : (_jsx("span", { className: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-black px-3 py-1 rounded-full", children: t('statusNormal') }))] }), _jsxs("div", { className: "bg-slate-950/80 p-4 rounded-2xl flex items-center justify-between border border-slate-800/80", children: [_jsx("span", { className: "text-xs text-slate-400 font-semibold", children: t('consecutiveAbsencesCount') }), _jsxs("span", { className: `text-2xl font-black ${isSevereRisk
+                                            ? 'text-rose-400'
+                                            : att.riskFlagged
+                                                ? 'text-purple-400'
+                                                : 'text-slate-200'}`, children: [att.consecutiveAbsences, " ", t('days')] })] }), _jsxs("div", { className: "flex items-center justify-between text-xs text-slate-400 font-medium pt-3 border-t border-slate-800", children: [_jsxs("div", { className: "flex items-center gap-1.5", children: [_jsx(Calendar, { className: "w-3.5 h-3.5 text-cyan-400" }), _jsxs("span", { children: [t('lastAttended'), " ", new Date(att.lastAttendDate).toLocaleDateString()] })] }), _jsxs("span", { children: [t('districtLabel'), ": ", att.child?.district || 'N/A'] })] })] }, att.id));
+                })) })] }));
+};
